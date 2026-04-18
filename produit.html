@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congo Pétrole | Marché des Gisements</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --gold: #f59e0b; --oil-black: #020617; }
+        body { background: var(--oil-black); font-family: 'Inter', sans-serif; color: white; }
+        
+        .card-oil { 
+            background: rgba(30, 41, 59, 0.6); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(245, 158, 11, 0.2); 
+            border-radius: 20px; 
+            overflow: hidden;
+        }
+        
+        .btn-buy { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: black; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            font-style: italic;
+            transition: 0.3s; 
+        }
+        .btn-buy:active { transform: scale(0.95); }
+        
+        .stats-header { 
+            background: linear-gradient(to right, #1e293b, #0f172a); 
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .active-badge { 
+            background: #22c55e; 
+            color: white; 
+            padding: 3px 10px; 
+            border-radius: 20px; 
+            font-size: 9px; 
+            font-weight: 900; 
+            position: absolute; 
+            top: 10px; 
+            right: 10px;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+        }
+
+        .nav-bottom { 
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(15px); 
+            border-top: 1px solid rgba(245, 158, 11, 0.2); 
+        }
+    </style>
+</head>
+<body class="pb-32">
+
+    <div class="stats-header p-6 flex items-center justify-between sticky top-0 z-40 shadow-2xl">
+        <div class="flex items-center">
+            <div class="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mr-3 border border-amber-500/50">
+                <i class="fa-solid fa-droplet text-amber-500 text-xl"></i>
+            </div>
+            <div>
+                <p id="userBalance" class="font-black text-xl italic text-amber-500">FC 0</p>
+                <p class="text-[9px] uppercase font-bold opacity-60 tracking-widest text-white">Capital Disponible</p>
+            </div>
+        </div>
+        
+        <a href="mes_investissements.html" class="text-right group active:scale-95 transition-transform">
+            <p id="userVipCount" class="font-black text-xl italic text-white">0</p>
+            <p class="text-[9px] uppercase font-bold text-amber-500 underline decoration-2 underline-offset-4">Mes Forages</p>
+        </a>
+    </div>
+
+    <div id="myInvestmentSection" class="hidden px-5 mt-6">
+        <h2 class="text-[10px] font-black uppercase text-amber-500 mb-4 tracking-[0.2em] italic border-l-4 border-amber-500 pl-3">Unité de production active</h2>
+        <div id="activeVipDisplay"></div>
+    </div>
+
+    <div class="px-5 mt-8">
+        <h2 class="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-[0.2em] italic border-l-4 border-slate-700 pl-3">Gisements disponibles</h2>
+        <div id="vipList" class="space-y-5">
+            </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 nav-bottom p-5 flex justify-around items-center z-50">
+        <a href="dashboard.html" class="flex flex-col items-center text-slate-500">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-[9px] font-bold mt-1 uppercase">Puits</span>
+        </a>
+        <a href="produit.html" class="flex flex-col items-center text-amber-500">
+            <i class="fa-solid fa-bag-shopping text-xl"></i>
+            <span class="text-[9px] font-bold mt-1 uppercase">Marché</span>
+        </a>
+        <a href="equipe.html" class="flex flex-col items-center text-slate-500">
+            <i class="fa-solid fa-users text-xl"></i>
+            <span class="text-[9px] font-bold mt-1 uppercase">Réseau</span>
+        </a>
+        <a href="compte.html" class="flex flex-col items-center text-slate-500">
+            <i class="fa-solid fa-user text-xl"></i>
+            <span class="text-[9px] font-bold mt-1 uppercase">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const DB_URL = "https://firstsolar-e2ba3-default-rtdb.firebaseio.com/congo_petrole/users";
+        const userPhone = localStorage.getItem('userPhone');
+
+        const vips = [
+            { id: 1, nom: "Gisement Alpha", prix: 8000, jour: 2300, img: "IMG_4607.jpeg" },
+            { id: 2, nom: "Unité Delta", prix: 20000, jour: 5200, img: "IMG_4608.jpeg" },
+            { id: 3, nom: "Station Omega", prix: 50000, jour: 13500, img: "IMG_4609.jpeg" },
+            { id: 4, nom: "Forage Nord", prix: 75000, jour: 19000, img: "IMG_4610.jpeg" },
+            { id: 5, nom: "Bloc 05", prix: 100000, jour: 28000, img: "IMG_4611.jpeg" },
+            { id: 6, nom: "Puits Central", prix: 150000, jour: 42000, img: "IMG_4612.jpeg" },
+            { id: 7, nom: "Raffinerie Est", prix: 280000, jour: 77000, img: "IMG_4613.jpeg" },
+            { id: 8, nom: "Complexe Sud", prix: 400000, jour: 96000, img: "IMG_4614.jpeg" },
+            { id: 9, nom: "Gisement Offshore", prix: 700000, jour: 148000, img: "IMG_4615.jpeg" },
+            { id: 10, nom: "Master Forage", prix: 1000000, jour: 258000, img: "IMG_4616.jpeg" },
+            { id: 11, nom: "Elite Pétrole", prix: 3000000, jour: 950000, img: "IMG_4617.jpeg" },
+            { id: 12, nom: "Empire Congo", prix: 7500000, jour: 1850000, img: "IMG_4619.jpeg" },
+            { id: 13, nom: "Légende Or Noir", prix: 10200000, jour: 2500000, img: "IMG_4620.jpeg" }
+        ];
+
+        async function fetchInfo() {
+            if (!userPhone) {
+                renderProducts(0, null);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${DB_URL}/${userPhone}.json`);
+                const data = await res.json();
+                if (data) {
+                    document.getElementById('userBalance').innerText = `FC ${parseFloat(data.balance || 0).toLocaleString()}`;
+                    document.getElementById('userVipCount').innerText = data.vipActive ? "1" : "0";
+                    renderProducts(data.balance, data.vipActive);
+                } else {
+                    renderProducts(0, null);
+                }
+            } catch (e) { 
+                renderProducts(0, null);
+            }
+        }
+
+        function renderProducts(currentBalance, activeVipId) {
+            const list = document.getElementById('vipList');
+            list.innerHTML = vips.map(v => `
+                <div class="card-oil p-4 flex gap-4 items-center shadow-lg relative">
+                    ${activeVipId == v.id ? '<span class="active-badge italic">EXPLOITÉ</span>' : ''}
+                    <div class="w-[35%] h-24 overflow-hidden rounded-xl border border-white/10">
+                        <img src="${v.img}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="w-[65%]">
+                        <h3 class="text-sm font-black text-amber-500 uppercase italic tracking-tight">${v.nom}</h3>
+                        <p class="text-[10px] font-bold text-slate-300 mt-1">Investissement: FC ${v.prix.toLocaleString()}</p>
+                        <p class="text-[10px] font-black text-green-500 italic">Gain: FC ${v.jour.toLocaleString()} / jour</p>
+                        <button onclick="validerAchat(${v.id}, ${v.prix}, ${currentBalance})" 
+                                ${activeVipId == v.id ? 'disabled' : ''}
+                                class="btn-buy mt-3 w-full py-2.5 text-[10px] uppercase tracking-wider ${activeVipId == v.id ? 'opacity-20 grayscale' : ''}">
+                            ${activeVipId == v.id ? 'Déjà en production' : 'Lancer le Forage'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            if (activeVipId) {
+                const myVip = vips.find(v => v.id == activeVipId);
+                const section = document.getElementById('myInvestmentSection');
+                if(myVip) {
+                    section.classList.remove('hidden');
+                    document.getElementById('activeVipDisplay').innerHTML = `
+                        <a href="mes_investissements.html" class="block bg-gradient-to-br from-amber-600 to-amber-900 p-5 rounded-2xl flex items-center gap-5 text-white shadow-2xl border border-amber-400/30">
+                            <div class="relative">
+                                <img src="${myVip.img}" class="w-16 h-16 rounded-full object-cover border-2 border-white/50">
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-amber-200 uppercase tracking-widest">Forage en cours...</p>
+                                <h3 class="text-lg font-black italic uppercase">${myVip.nom}</h3>
+                                <p class="text-[10px] opacity-90 font-bold">Voir la production →</p>
+                            </div>
+                        </a>
+                    `;
+                }
+            }
+        }
+
+        async function validerAchat(id, prix, balance) {
+            if (!userPhone) return alert("Veuillez vous connecter pour investir.");
+            if (balance < prix) return alert("Capital insuffisant ! Rechargez votre compte.");
+            if (!confirm(`Confirmer l'exploitation du ${vips.find(x => x.id == id).nom} ?`)) return;
+
+            try {
+                const nouveauSolde = balance - prix;
+                const now = Date.now();
+                await fetch(`${DB_URL}/${userPhone}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ 
+                        balance: nouveauSolde, 
+                        vipActive: id, 
+                        purchaseDate: now 
+                    })
+                });
+
+                alert("Forage lancé avec succès !");
+                window.location.href = "mes_investissements.html"; // Redirection automatique après achat
+            } catch (e) { alert("Erreur lors de l'activation."); }
+        }
+
+        window.onload = fetchInfo;
+    </script>
+</body>
+</html>
