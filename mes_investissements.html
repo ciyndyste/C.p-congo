@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congo Pétrole | Mes Investissements</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --gold: #f59e0b; --oil-black: #020617; }
+        body { background: var(--oil-black); font-family: 'Inter', sans-serif; color: white; }
+        
+        .card-active { 
+            background: rgba(30, 41, 59, 0.4); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(245, 158, 11, 0.3); 
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-collect { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: black; 
+            border-radius: 15px; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        .btn-collect:disabled { 
+            background: #1e293b; 
+            color: #475569; 
+            cursor: not-allowed; 
+            box-shadow: none;
+            transform: none; 
+        }
+
+        .progress-bar { background: rgba(0,0,0,0.3); border-radius: 10px; height: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .progress-fill { 
+            background: linear-gradient(90deg, #f59e0b, #fbbf24); 
+            height: 100%; 
+            border-radius: 10px;
+            transition: 1s linear; 
+            width: 0%; 
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+
+        .nav-bottom { 
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(15px); 
+            border-top: 1px solid rgba(245, 158, 11, 0.2); 
+        }
+    </style>
+</head>
+<body class="pb-32">
+
+    <div class="bg-slate-900/50 backdrop-blur-md p-5 flex items-center border-b border-white/5 sticky top-0 z-50">
+        <a href="produit.html" class="text-amber-500 mr-4 active:scale-90 transition-transform">
+            <i class="fa-solid fa-chevron-left text-xl"></i>
+        </a>
+        <h1 class="text-sm font-black uppercase tracking-widest text-amber-500">Mes Forages Actifs</h1>
+    </div>
+
+    <div class="px-5 mt-6">
+        <div class="bg-gradient-to-br from-amber-500 to-amber-700 p-6 rounded-[2rem] text-black shadow-2xl flex justify-between items-center">
+            <div>
+                <p class="text-[9px] uppercase font-black opacity-70 tracking-tighter">Production journalière</p>
+                <p id="profitDisplay" class="text-2xl font-black italic">FC 0</p>
+            </div>
+            <div class="w-12 h-12 bg-black/20 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-oil-well text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <div id="activeProductsContainer" class="px-5 mt-8 space-y-6">
+        <div id="loading" class="text-center py-24">
+            <p class="text-slate-500 font-bold text-xs uppercase tracking-widest animate-pulse">Analyse des gisements en cours...</p>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 nav-bottom p-4 flex justify-around items-center z-50">
+        <a href="dashboard.html" class="flex flex-col items-center text-slate-500"><i class="fa-solid fa-house text-xl"></i></a>
+        <a href="produit.html" class="flex flex-col items-center text-amber-500"><i class="fa-solid fa-bag-shopping text-xl"></i></a>
+        <a href="equipe.html" class="flex flex-col items-center text-slate-500"><i class="fa-solid fa-users text-xl"></i></a>
+        <a href="compte.html" class="flex flex-col items-center text-slate-500"><i class="fa-solid fa-user text-xl"></i></a>
+    </nav>
+
+    <script>
+        const DB_URL = "https://firstsolar-e2ba3-default-rtdb.firebaseio.com/congo_petrole/users";
+        const userPhone = localStorage.getItem('userPhone');
+
+        // Configuration des produits (Doit correspondre exactement aux IDs de ta boutique)
+        const vipsData = {
+            1: { nom: "Gisement Alpha", img: "IMG_4607.jpeg", gain: 2300 },
+            2: { nom: "Unité Delta", img: "IMG_4608.jpeg", gain: 5200 },
+            3: { nom: "Station Omega", img: "IMG_4609.jpeg", gain: 13500 },
+            4: { nom: "Forage Nord", img: "IMG_4610.jpeg", gain: 19000 },
+            5: { nom: "Bloc 05", img: "IMG_4611.jpeg", gain: 28000 },
+            6: { nom: "Puits Central", img: "IMG_4612.jpeg", gain: 42000 },
+            7: { nom: "Raffinerie Est", img: "IMG_4613.jpeg", gain: 77000 },
+            8: { nom: "Complexe Sud", img: "IMG_4614.jpeg", gain: 96000 },
+            9: { nom: "Gisement Offshore", img: "IMG_4615.jpeg", gain: 148000 },
+            10: { nom: "Master Forage", img: "IMG_4616.jpeg", gain: 258000 },
+            11: { nom: "Elite Pétrole", img: "IMG_4617.jpeg", gain: 950000 },
+            12: { nom: "Empire Congo", img: "IMG_4619.jpeg", gain: 1850000 },
+            13: { nom: "Légende Or Noir", img: "IMG_4620.jpeg", gain: 2500000 }
+        };
+
+        async function loadMyInvestments() {
+            if (!userPhone) return window.location.href = "login.html";
+
+            try {
+                const res = await fetch(`${DB_URL}/${userPhone}.json`);
+                const user = await res.json();
+
+                // On vérifie si l'utilisateur possède un produit actif
+                if (user && user.vipActive) {
+                    const vipId = user.vipActive;
+                    const details = vipsData[vipId];
+                    
+                    if (details) {
+                        // Mise à jour du gain affiché en haut
+                        document.getElementById('profitDisplay').innerText = `FC ${details.gain.toLocaleString()}`;
+                        
+                        // Calcul du temps : soit la dernière récolte, soit la date d'achat
+                        const lastTime = user.lastHarvest || user.purchaseDate || Date.now(); 
+                        renderCard(vipId, details, lastTime);
+                    } else {
+                        showEmpty();
+                    }
+                } else {
+                    showEmpty();
+                }
+            } catch (e) { 
+                console.error(e);
+                showEmpty();
+            }
+        }
+
+        function renderCard(id, details, lastTime) {
+            const container = document.getElementById('activeProductsContainer');
+            container.innerHTML = `
+                <div class="card-active p-5">
+                    <div class="flex gap-4 items-center mb-5">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden border border-amber-500/30 bg-slate-800">
+                            <img src="${details.img}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/1e293b/f59e0b?text=Pétrole'">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xs font-black text-white uppercase italic tracking-wider">${details.nom}</h3>
+                            <p id="statusText" class="text-[9px] font-bold uppercase mt-0.5 text-amber-500 italic">Extraction active...</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-black text-amber-500 italic">+FC ${details.gain.toLocaleString()}</p>
+                            <p class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Cycle 24H</p>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar mb-5">
+                        <div id="pBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+
+                    <button id="btnCollect" onclick="collecterGains(${details.gain})" disabled 
+                            class="btn-collect w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all">
+                        Synchronisation...
+                    </button>
+                </div>
+            `;
+            startCountdown(lastTime);
+        }
+
+        function startCountdown(lastTime) {
+            const btn = document.getElementById('btnCollect');
+            const status = document.getElementById('statusText');
+            const bar = document.getElementById('pBar');
+            const cycle = 24 * 60 * 60 * 1000; 
+
+            const update = () => {
+                const now = Date.now();
+                const elapsed = now - lastTime;
+                const remaining = cycle - elapsed;
+
+                if (remaining <= 0) {
+                    btn.disabled = false;
+                    btn.innerText = "Récolter les revenus";
+                    status.innerText = "Production prête !";
+                    status.className = "text-[9px] font-bold uppercase mt-0.5 text-green-500 italic";
+                    bar.style.width = "100%";
+                } else {
+                    const h = Math.floor(remaining / 3600000);
+                    const m = Math.floor((remaining % 3600000) / 60000);
+                    const s = Math.floor((remaining % 60000) / 1000);
+                    btn.innerText = `Prochaine récolte : ${h}h ${m}m ${s}s`;
+                    
+                    const percent = Math.min((elapsed / cycle) * 100, 100);
+                    bar.style.width = percent + "%";
+                    setTimeout(update, 1000);
+                }
+            };
+            update();
+        }
+
+        async function collecterGains(montant) {
+            try {
+                const btn = document.getElementById('btnCollect');
+                btn.disabled = true;
+                btn.innerText = "Transfert en cours...";
+
+                const res = await fetch(`${DB_URL}/${userPhone}.json`);
+                const user = await res.json();
+                
+                const now = Date.now();
+                const nouveauSolde = (parseFloat(user.balance) || 0) + montant;
+
+                await fetch(`${DB_URL}/${userPhone}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ 
+                        balance: nouveauSolde,
+                        lastHarvest: now 
+                    })
+                });
+
+                alert(`Félicitations ! FC ${montant.toLocaleString()} ont été ajoutés à votre compte.`);
+                window.location.reload(); 
+            } catch (e) { 
+                alert("Erreur réseau. Vérifiez votre connexion.");
+                console.error(e);
+            }
+        }
+
+        function showEmpty() {
+            document.getElementById('activeProductsContainer').innerHTML = `
+                <div class="text-center py-20 bg-slate-900/30 rounded-[2rem] border border-dashed border-slate-800">
+                    <i class="fa-solid fa-faucet-drip text-4xl text-slate-800 mb-4"></i>
+                    <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">Aucune unité de forage active</p>
+                    <a href="produit.html" class="inline-block bg-amber-500 text-black px-8 py-3 rounded-xl font-black text-[9px] uppercase mt-6 tracking-widest hover:scale-105 transition-transform">Explorer la boutique</a>
+                </div>`;
+        }
+
+        window.onload = loadMyInvestments;
+    </script>
+</body>
+</html>
