@@ -190,7 +190,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if (refCode) {
-                // On retire "CP-" si présent dans l'URL pour garder le code propre
+                // Harmonisation du code (retrait du préfixe CP- si présent)
                 document.getElementById('inviteCode').value = refCode.replace('CP-', '').toUpperCase();
             }
         });
@@ -198,20 +198,20 @@
         document.getElementById("registerForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             
-            // Formatage du numéro de téléphone
+            // Nettoyage et formatage du numéro (Format international RDC : 243...)
             const phoneInput = document.getElementById('phone').value.trim().replace(/\s/g, '');
             const phone = phoneInput.startsWith('243') ? phoneInput : '243' + phoneInput.replace(/^0/, '');
             
             const password = document.getElementById('password').value.trim();
             const confirmPassword = document.getElementById('confirmPassword').value.trim();
             
-            // Nettoyage du code d'invitation (on ne garde que le code, pas le préfixe CP-)
+            // Nettoyage du code parrain
             let inviteCode = document.getElementById('inviteCode').value.trim().toUpperCase();
             inviteCode = inviteCode.replace('CP-', '');
 
             const submitBtn = document.getElementById('submitBtn');
 
-            // Validations
+            // Validations de base
             if (password !== confirmPassword) { return alert("Les mots de passe ne correspondent pas."); }
             if (password.length < 6 || !/^\d+$/.test(password)) { return alert("Le mot de passe doit contenir au moins 6 chiffres."); }
             if (phone.length < 12) { return alert("Numéro de téléphone invalide."); }
@@ -228,26 +228,26 @@
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Créer un compte";
                 } else {
-                    // --- ENREGISTREMENT AVEC SYSTÈME DE PARRAINAGE HARMONISÉ ---
+                    // --- ENREGISTREMENT DANS LA BASE DE DONNÉES ---
                     await set(userRef, {
                         phone: phone,
                         password: password, 
-                        parrain: inviteCode, // Stocke le code propre (ex: A1B2C3)
+                        parrain: inviteCode, 
                         balance: 0,
-                        totalInvested: 0, // INDISPENSABLE pour les calculs de commissions
+                        totalInvested: 0, // Indispensable pour l'affichage réseau
                         vipActive: 0,
                         lastHarvest: Date.now(),
                         dateJoined: new Date().toLocaleString(),
-                        // On génère le code de l'utilisateur sur les 6 derniers chiffres
+                        // Génération du code personnel (6 derniers chiffres du tel)
                         myInviteCode: phone.substring(phone.length - 6).toUpperCase() 
                     });
                     
-                    alert("Compte créé avec succès !");
+                    alert("Compte créé avec succès ! Bienvenue chez Congo Pétrole.");
                     window.location.href = "login.html";
                 }
             } catch (error) {
                 console.error(error);
-                alert("Erreur de connexion à la base de données.");
+                alert("Erreur réseau. Vérifiez votre connexion.");
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Créer un compte";
             }
