@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congo Pétrole | Financement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --gold: #f59e0b; --oil-black: #020617; }
+        body { background: var(--oil-black); font-family: 'Inter', sans-serif; color: white; }
+        
+        .amount-card { border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s; cursor: pointer; background: rgba(30, 41, 59, 0.4); }
+        .amount-card.active { border-color: var(--gold); background: rgba(245, 158, 11, 0.1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+        
+        .network-card { border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.3s; cursor: pointer; background: rgba(30, 41, 59, 0.4); border-radius: 20px; }
+        .network-card.active { border-color: var(--gold); background: white; color: black; }
+        
+        .btn-confirm { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; }
+        .network-logo { width: 35px; height: 35px; object-fit: contain; margin-bottom: 6px; border-radius: 8px; }
+        
+        input { background: rgba(15, 23, 42, 0.6) !important; color: white !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
+        input:focus { border-color: var(--gold) !important; outline: none; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <div class="bg-slate-900/50 backdrop-blur-md p-5 flex items-center border-b border-white/5 sticky top-0 z-50">
+        <a href="compte.html" class="text-amber-500 mr-4 active:scale-90 transition-transform">
+            <i class="fa-solid fa-chevron-left text-xl"></i>
+        </a>
+        <h1 class="text-sm font-black uppercase tracking-widest text-white">Financement du Puits</h1>
+    </div>
+
+    <div class="p-5">
+        <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-[0.2em] border-l-2 border-amber-500 pl-3">1. Sélectionnez un Gisement</p>
+        <div class="grid grid-cols-2 gap-3 mb-8">
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 8000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 1</p>
+                <p class="text-sm font-black italic">FC 8.000</p>
+            </div>
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 20000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 2</p>
+                <p class="text-sm font-black italic">FC 20.000</p>
+            </div>
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 50000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 3</p>
+                <p class="text-sm font-black italic">FC 50.000</p>
+            </div>
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 100000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 5</p>
+                <p class="text-sm font-black italic">FC 100.000</p>
+            </div>
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 400000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 8</p>
+                <p class="text-sm font-black italic">FC 400.000</p>
+            </div>
+            <div class="amount-card p-4 rounded-2xl text-center" onclick="selectAmount(this, 1000000)">
+                <p class="text-[9px] font-black text-amber-500 uppercase">Gisement 10</p>
+                <p class="text-sm font-black italic">FC 1.000.000</p>
+            </div>
+        </div>
+
+        <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-[0.2em] border-l-2 border-amber-500 pl-3">2. Opérateur de Transfert</p>
+        <div class="grid grid-cols-3 gap-2 mb-8">
+            <div class="network-card p-4 text-center flex flex-col items-center justify-center" onclick="selectNetwork(this, 'ORANGE', '+243852771755')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" class="network-logo">
+                <p class="text-[9px] font-black uppercase">Orange</p>
+            </div>
+            <div class="network-card p-4 text-center flex flex-col items-center justify-center" onclick="selectNetwork(this, 'AIRTEL', '+243998566330')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Airtel_logo.svg" alt="Airtel" class="network-logo">
+                <p class="text-[9px] font-black uppercase">Airtel</p>
+            </div>
+            <div class="network-card p-4 text-center flex flex-col items-center justify-center" onclick="selectNetwork(this, 'VODACOM', '+243824661307')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Vodacom_Logo.svg" alt="Vodacom" class="network-logo">
+                <p class="text-[9px] font-black uppercase">M-Pesa</p>
+            </div>
+        </div>
+
+        <div id="paymentInstructions" class="hidden bg-slate-900/80 p-6 rounded-[30px] border border-amber-500/30 mb-8 backdrop-blur-md">
+            <p class="text-center text-[9px] font-black text-slate-400 uppercase mb-3 italic tracking-widest">Récepteur Officiel <span id="selectedNetName" class="text-amber-500"></span></p>
+            
+            <div class="flex items-center justify-between bg-black/40 p-5 rounded-2xl mb-5 border border-white/5">
+                <span id="officialNumber" class="text-xl font-black text-white tracking-widest italic"></span>
+                <button onclick="copyNumber()" class="bg-amber-500 text-black px-4 py-1.5 rounded-lg font-black text-[10px] uppercase">Copier</button>
+            </div>
+
+            <p class="text-[10px] text-slate-400 text-center italic mb-8 px-2">Veuillez effectuer le dépôt manuellement via votre téléphone, puis validez les détails ci-dessous.</p>
+            
+            <form id="rechargeForm" class="space-y-6">
+                <div>
+                    <label class="text-[9px] font-black uppercase text-amber-500/60 ml-1 tracking-widest">ID de Transaction / Réf</label>
+                    <input type="text" id="txId" placeholder="Ex: 58294021" class="w-full p-4 rounded-2xl text-sm font-bold mt-1" required>
+                </div>
+                <div>
+                    <label class="text-[9px] font-black uppercase text-amber-500/60 ml-1 tracking-widest">Votre Numéro d'expédition</label>
+                    <input type="tel" id="senderPhone" placeholder="+243..." class="w-full p-4 rounded-2xl text-sm font-bold mt-1" required>
+                </div>
+                <button type="submit" id="submitBtn" class="w-full btn-confirm py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
+                    Confirmer le dépôt
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Console Congo Pétrole
+        const DB_URL = "https://firstsolar-e2ba3-default-rtdb.firebaseio.com/congo_petrole";
+        const loggedUserPhone = localStorage.getItem('userPhone') || "0000000000";
+        let selectedAmount = 0;
+        let currentNumber = "";
+        let selectedNetworkName = "";
+
+        function selectAmount(element, amount) {
+            document.querySelectorAll('.amount-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            selectedAmount = amount;
+        }
+
+        function selectNetwork(element, name, number) {
+            if(selectedAmount === 0) {
+                alert("Veuillez sélectionner un montant d'investissement d'abord.");
+                return;
+            }
+            document.querySelectorAll('.network-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            
+            document.getElementById('paymentInstructions').classList.remove('hidden');
+            document.getElementById('selectedNetName').innerText = name;
+            document.getElementById('officialNumber').innerText = number;
+            currentNumber = number;
+            selectedNetworkName = name;
+            
+            document.getElementById('paymentInstructions').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyNumber() {
+            navigator.clipboard.writeText(currentNumber);
+            alert("Numéro copié : " + currentNumber);
+        }
+
+        document.getElementById('rechargeForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const txId = document.getElementById('txId').value;
+            const senderPhone = document.getElementById('senderPhone').value;
+
+            btn.disabled = true;
+            btn.innerText = "Traitement du forage...";
+
+            const rechargeData = {
+                phone: loggedUserPhone,
+                montant: parseFloat(selectedAmount),
+                reseau: selectedNetworkName,
+                transactionId: txId,
+                expediteur: senderPhone,
+                statut: "En attente",
+                date: new Date().toLocaleString('fr-FR')
+            };
+
+            try {
+                // Envoi vers le dossier recharges de Congo Pétrole
+                await fetch(`${DB_URL}/recharges.json`, {
+                    method: 'POST',
+                    body: JSON.stringify(rechargeData)
+                });
+
+                alert("Demande envoyée ! Votre capital sera crédité sur votre compte Congo Pétrole après vérification de la transaction.");
+                window.location.href = "compte.html";
+            } catch (err) {
+                alert("Erreur de connexion au serveur.");
+                btn.disabled = false;
+                btn.innerText = "Confirmer le dépôt";
+            }
+        };
+    </script>
+</body>
+</html>
