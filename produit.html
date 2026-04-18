@@ -79,8 +79,7 @@
 
     <div class="px-5 mt-8">
         <h2 class="text-[10px] font-black uppercase text-slate-500 mb-4 tracking-[0.2em] italic border-l-4 border-slate-700 pl-3">Gisements disponibles</h2>
-        <div id="vipList" class="space-y-5">
-            </div>
+        <div id="vipList" class="space-y-5"></div>
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 nav-bottom p-5 flex justify-around items-center z-50">
@@ -123,11 +122,7 @@
         ];
 
         async function fetchInfo() {
-            if (!userPhone) {
-                renderProducts(0, null);
-                return;
-            }
-
+            if (!userPhone) return;
             try {
                 const res = await fetch(`${DB_URL}/${userPhone}.json`);
                 const data = await res.json();
@@ -135,12 +130,8 @@
                     document.getElementById('userBalance').innerText = `FC ${parseFloat(data.balance || 0).toLocaleString()}`;
                     document.getElementById('userVipCount').innerText = data.vipActive ? "1" : "0";
                     renderProducts(data.balance, data.vipActive);
-                } else {
-                    renderProducts(0, null);
                 }
-            } catch (e) { 
-                renderProducts(0, null);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function renderProducts(currentBalance, activeVipId) {
@@ -166,46 +157,81 @@
 
             if (activeVipId) {
                 const myVip = vips.find(v => v.id == activeVipId);
-                const section = document.getElementById('myInvestmentSection');
                 if(myVip) {
-                    section.classList.remove('hidden');
+                    document.getElementById('myInvestmentSection').classList.remove('hidden');
                     document.getElementById('activeVipDisplay').innerHTML = `
-                        <a href="mes_investissements.html" class="block bg-gradient-to-br from-amber-600 to-amber-900 p-5 rounded-2xl flex items-center gap-5 text-white shadow-2xl border border-amber-400/30">
-                            <div class="relative">
-                                <img src="${myVip.img}" class="w-16 h-16 rounded-full object-cover border-2 border-white/50">
-                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-                            </div>
+                        <a href="mes_investissements.html" class="block bg-gradient-to-br from-amber-600 to-amber-900 p-5 rounded-2xl flex items-center gap-5 text-white border border-amber-400/30">
+                            <img src="${myVip.img}" class="w-16 h-16 rounded-full object-cover border-2 border-white/50">
                             <div>
-                                <p class="text-[9px] font-black text-amber-200 uppercase tracking-widest">Forage en cours...</p>
+                                <p class="text-[9px] font-black text-amber-200 uppercase">Forage en cours...</p>
                                 <h3 class="text-lg font-black italic uppercase">${myVip.nom}</h3>
-                                <p class="text-[10px] opacity-90 font-bold">Voir la production →</p>
                             </div>
-                        </a>
-                    `;
+                        </a>`;
                 }
             }
         }
 
-        async function validerAchat(id, prix, balance) {
-            if (!userPhone) return alert("Veuillez vous connecter pour investir.");
-            if (balance < prix) return alert("Capital insuffisant ! Rechargez votre compte.");
-            if (!confirm(`Confirmer l'exploitation du ${vips.find(x => x.id == id).nom} ?`)) return;
+        // --- FONCTION DE DISTRIBUTION DES COMMISSIONS (3 NIVEAUX) ---
+        async function distribuerCommissions(currentParrain, prix, niveau) {
+            if (!currentParrain || currentParrain === "aucun" || niveau > 3) return;
 
             try {
+                const res = await fetch(`${DB_URL}/${currentParrain}.json`);
+                const parrainData = await res.json();
+
+                if (parrainData) {
+                    let pourcentage = 0;
+                    if (niveau === 1) pourcentage = 0.35; // 35%
+                    else if (niveau === 2) pourcentage = 0.02; // 2%
+                    else if (niveau === 3) pourcentage = 0.01; // 1%
+
+                    const commission = prix * pourcentage;
+                    const nouveauSolde = (Number(parrainData.balance) || 0) + commission;
+
+                    await fetch(`${DB_URL}/${currentParrain}.json`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ balance: nouveauSolde })
+                    });
+
+                    console.log(`Niveau ${niveau} : ${commission} FC versés à ${currentParrain}`);
+
+                    // Appel récursif pour le niveau suivant
+                    if (parrainData.parrain) {
+                        await distribuerCommissions(parrainData.parrain, prix, niveau + 1);
+                    }
+                }
+            } catch (e) { console.error("Erreur commission niveau " + niveau, e); }
+        }
+
+        async function validerAchat(id, prix, balance) {
+            if (!userPhone) return alert("Connectez-vous !");
+            if (balance < prix) return alert("Solde insuffisant !");
+            if (!confirm("Confirmer cet investissement ?")) return;
+
+            try {
+                // 1. Récupérer les infos de l'acheteur
+                const userRes = await fetch(`${DB_URL}/${userPhone}.json`);
+                const userData = await userRes.json();
+                
+                // 2. Déduire le prix et activer le VIP
                 const nouveauSolde = balance - prix;
-                const now = Date.now();
                 await fetch(`${DB_URL}/${userPhone}.json`, {
                     method: 'PATCH',
                     body: JSON.stringify({ 
                         balance: nouveauSolde, 
                         vipActive: id, 
-                        purchaseDate: now 
+                        purchaseDate: Date.now() 
                     })
                 });
 
-                alert("Forage lancé avec succès !");
-                window.location.href = "mes_investissements.html"; // Redirection automatique après achat
-            } catch (e) { alert("Erreur lors de l'activation."); }
+                // 3. Lancer la cascade des commissions
+                if (userData.parrain) {
+                    await distribuerCommissions(userData.parrain, prix, 1);
+                }
+
+                alert("Investissement réussi ! Production lancée.");
+                window.location.href = "mes_investissements.html";
+            } catch (e) { alert("Erreur lors de l'achat."); }
         }
 
         window.onload = fetchInfo;
