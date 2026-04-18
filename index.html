@@ -10,102 +10,146 @@
         :root { 
             --gold: #f59e0b; 
             --dark-oil: #020617; 
+            --gree-gray: #f2f2f2; /* La couleur de fond des inputs sur l'image */
         }
         
-        /* Centralisation absolue et fond image */
+        /* Centralisation absolue et fond image (votre fond pétrole) */
         body { 
             margin: 0; padding: 0;
             display: flex; align-items: center; justify-content: center; 
             min-height: 100vh;
             background: url('IMG_4394.jpeg') no-repeat center center fixed;
             background-size: cover;
-            font-family: 'Inter', sans-serif;
-            color: white;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Police plus proche de l'image */
+            color: black; /* Le texte de la carte est sombre */
             overflow: hidden;
         }
 
-        /* Superposition sombre sur l'image de fond */
+        /* Superposition sombre sur l'image de fond pour le contraste */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); z-index: 1;
+            background: rgba(0, 0, 0, 0.5); z-index: 1;
         }
 
-        /* Carte Glassmorphism Modernisée */
+        /* Carte Blanche (Design GREE) */
         .oil-card { 
             position: relative; z-index: 10;
-            background: rgba(15, 23, 42, 0.85); /* Fond sombre mais translucide */
-            backdrop-filter: blur(15px); /* Effet de flou de verre */
-            border: 2px solid rgba(245, 158, 11, 0.2); /* Bordure or légère */
-            border-radius: 30px;
-            padding: 35px 25px;
+            background: #ffffff; /* Fond blanc pur comme sur l'image */
+            border-radius: 20px; /* Arrondis plus doux comme l'image */
+            padding: 40px 20px;
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            max-width: 380px; /* Taille compacte */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
 
-        /* Titre doré et italique */
+        /* Titre Congo Pétrole (on garde votre style mais plus petit) */
         h1 { 
             color: var(--gold);
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 900;
             font-style: italic;
             text-transform: uppercase;
             letter-spacing: -1px;
-            line-height: 1;
+            margin-bottom: 5px;
         }
 
-        /* Style des Champs de Saisie (Glassmorphism) */
-        .input-group { margin-bottom: 20px; text-align: left; }
-        
-        input { 
+        /* Style des Champs de Saisie (Exactement comme GREE) */
+        .input-modern { 
             width: 100%;
-            padding: 16px;
+            padding: 18px; /* Plus grand pour l'ergonomie */
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03); /* Très léger fond */
-            color: white;
+            border: 1px solid #e0e0e0; /* Bordure fine grise */
+            background-color: var(--gree-gray); /* Fond gris très clair */
+            color: #333;
             outline: none;
             transition: 0.3s;
             box-sizing: border-box;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            margin-bottom: 15px; /* Espace entre les champs */
         }
 
-        input:focus { 
+        /* Focus doré pour l'identité Congo Pétrole */
+        .input-modern:focus { 
             border-color: var(--gold);
-            background: rgba(245, 158, 11, 0.05); /* Accent or léger */
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+            background-color: #ffffff; /* Devient blanc au focus */
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
         }
 
-        input::placeholder { color: rgba(255, 255, 255, 0.3); }
+        .input-modern::placeholder { color: #aaaaaa; font-weight: 400; }
 
-        /* Bouton "Or" Premium */
+        /* Conteneur spécial pour le téléphone avec le préfixe fixe */
+        .phone-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--gree-gray);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .phone-prefix {
+            padding: 18px 0 18px 18px;
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .phone-container input {
+            border: none;
+            margin-bottom: 0;
+            padding-left: 10px;
+        }
+        
+        .phone-container:focus-within {
+            border-color: var(--gold);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        .phone-container:focus-within input {
+            background-color: #ffffff;
+        }
+
+        /* Bouton Principal Noir (Design GREE, couleur or Congo) */
         .btn-gold {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #000;
+            background-color: #000000; /* Bouton Noir comme sur l'image */
+            color: var(--gold); /* Texte Doré pour l'identité */
             border: none;
-            border-radius: 15px;
-            font-weight: 900;
-            font-style: italic;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            border-radius: 30px; /* Très arrondi comme GREE */
+            font-weight: 700;
+            text-transform: none; /* Pas de majuscules automatiques */
+            letter-spacing: normal;
             transition: 0.3s;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-gold:active { transform: scale(0.97); opacity: 0.8; }
+        .btn-gold:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
+
+        /* Bouton Secondaire "Se connecter" (Design GREE) */
+        .btn-outline {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #333; /* Bordure noire fine */
+            border-radius: 30px;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
             margin-top: 15px;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
         }
-
-        .btn-gold:active { transform: scale(0.96); }
-
-        /* Lien pied de page */
-        .login-link { 
-            color: var(--gold);
-            font-weight: bold;
-            text-decoration: underline;
-        }
+        
+        .btn-outline:active { background-color: #f0f0f0; }
 
     </style>
 </head>
@@ -114,40 +158,40 @@
     <div class="overlay"></div>
 
     <div class="oil-card">
-        <div class="text-center mb-10">
-            <div class="inline-block p-4 rounded-full bg-amber-500/10 mb-4 ring-2 ring-amber-500/30">
-                <i class="fa-solid fa-droplet text-5xl text-amber-500 animate-pulse"></i>
+        <div class="text-center mb-12">
+            <div class="inline-block p-4 rounded-full bg-amber-500/10 ring-1 ring-amber-500/20 mb-3">
+                <i class="fa-solid fa-droplet text-4xl text-amber-500 animate-pulse"></i>
             </div>
             <h1>Congo Pétrole</h1>
-            <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em] mt-2">Investissement Énergétique</p>
+            <p class="text-[9px] text-gray-500 uppercase tracking-[0.3em]">Investissement Énergétique</p>
         </div>
 
         <form id="registerForm">
-            <div class="input-group">
-                <input type="tel" id="phone" placeholder="Numéro Téléphone (243...)" class="input-modern" required>
+            <div class="phone-container">
+                <span class="phone-prefix">+243</span>
+                <input type="tel" id="phone" placeholder="Numéro de téléphone portable" required>
             </div>
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Mot de passe (6 chiffres)" class="input-modern" required>
-            </div>
-            <div class="input-group">
-                <input type="text" id="inviteCode" placeholder="Code d'invitation Parrain" class="input-modern" required>
-            </div>
+            
+            <input type="password" id="password" placeholder="Veuillez saisir votre mot de passe" class="input-modern" required>
+            <input type="password" id="confirmPassword" placeholder="Répéter le mot de passe" class="input-modern" required>
+            <input type="text" id="inviteCode" placeholder="Code d'invitation Parrain" class="input-modern" required>
 
             <button type="submit" id="submitBtn" class="btn-gold">
-                Démarrer l'Exploitation
+                Créer un compte
             </button>
         </form>
 
-        <p class="text-center mt-8 text-xs text-gray-500 uppercase font-medium">
-            Déjà partenaire ? <a href="login.html" class="login-link">Se connecter</a>
-        </p>
+        <div class="mt-4">
+            <a href="login.html" class="btn-outline">
+                J'ai déjà un compte, connectez-vous
+            </a>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Configuration Firebase (Assurez-vous d'avoir remplacé ces valeurs par les vôtres)
         const firebaseConfig = {
             databaseURL: "https://firstsolar-e2ba3-default-rtdb.firebaseio.com"
         };
@@ -158,7 +202,7 @@
         // --- DÉTECTION AUTOMATIQUE DU CODE PARRAIN DANS L'URL ---
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref'); // Cherche ?ref=CMSXXXXX
+            const refCode = urlParams.get('ref');
             if (refCode) {
                 document.getElementById('inviteCode').value = refCode;
             }
@@ -167,47 +211,61 @@
         document.getElementById("registerForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             
-            const phone = document.getElementById('phone').value.trim().replace(/\+/g, '');
+            // Récupération et nettoyage du numéro (on enlève les espaces s'il y en a)
+            const phoneInput = document.getElementById('phone').value.trim().replace(/\s/g, '');
+            // On s'assure que le numéro commence par 243 pour Firebase
+            const phone = phoneInput.startsWith('243') ? phoneInput : '243' + phoneInput.replace(/^0/, '');
+            
             const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
             const inviteCode = document.getElementById('inviteCode').value.trim();
             const submitBtn = document.getElementById('submitBtn');
 
-            // Validation minimale du mot de passe
+            // --- VALIDATIONS ---
+            if (password !== confirmPassword) {
+                return alert("Les deux mots de passe ne correspondent pas.");
+            }
+
             if (password.length < 6 || !/^\d+$/.test(password)) {
                 return alert("Le mot de passe doit contenir au moins 6 chiffres.");
             }
 
+            // Simple validation du numéro congolais (min 9 chiffres après 243)
+            if (phone.length < 12) {
+                return alert("Veuillez saisir un numéro de téléphone valide.");
+            }
+
             submitBtn.disabled = true;
-            submitBtn.innerText = "FORAGE EN COURS...";
+            submitBtn.innerText = "Création en cours...";
 
             try {
-                // Utilisation d'un dossier dédié 'congo_petrole' pour ne pas écraser vos autres projets
                 const userRef = ref(db, 'congo_petrole/users/' + phone);
                 const snapshot = await get(userRef);
 
                 if (snapshot.exists()) {
                     alert("Ce compte existe déjà. Connectez-vous.");
                     submitBtn.disabled = false;
-                    submitBtn.innerText = "Démarrer l'Exploitation";
+                    submitBtn.innerText = "Créer un compte";
                 } else {
+                    // Création de l'utilisateur dans la branche congo_petrole
                     await set(userRef, {
                         phone: phone,
-                        password: password, // Important : Stockage en clair pour test, à chiffrer en production !
+                        password: password, 
                         referralBy: inviteCode,
                         balance: 0,
-                        lastProfit: Date.now(),
+                        lastHarvest: Date.now(),
                         dateJoined: new Date().toLocaleString(),
-                        // Génération du code personnel pour l'utilisateur
                         myInviteCode: "PETROL" + phone.slice(-4)
                     });
                     
-                    alert("Compte Congo Pétrole créé avec succès !");
+                    alert("Compte Congo Pétrole créé avec succès ! Veuillez vous connecter.");
                     window.location.href = "login.html";
                 }
             } catch (error) {
+                console.error(error);
                 alert("Erreur réseau. Veuillez réessayer.");
                 submitBtn.disabled = false;
-                submitBtn.innerText = "Démarrer l'Exploitation";
+                submitBtn.innerText = "Créer un compte";
             }
         });
     </script>
